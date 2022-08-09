@@ -30,6 +30,7 @@ int builtin_alias(char **argv, char __attribute__((__unused__)) * *start)
         }
         return (ret_val);
     }
+
     for (i = 0; argv[i]; i++)
     {
         intr = ll_aliases;
