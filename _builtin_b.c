@@ -44,6 +44,7 @@ int builtin_unsetenv(char **argv, char __attribute__((__unused__)) * *start)
 {
     char **env_var, **new_environ;
     size_t size;
+    int index, index2;
 
     if (!argv[0])
         return (gen_error(argv, -1));
@@ -58,7 +59,7 @@ int builtin_unsetenv(char **argv, char __attribute__((__unused__)) * *start)
     if (!new_environ)
         return (gen_error(argv, -1));
 
-    for (int index = 0, index2 = 0; environ[index]; index++)
+    for (index = 0, index2 = 0; environ[index]; index++)
     {
         if (*env_var == environ[index])
         {

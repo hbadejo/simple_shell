@@ -54,11 +54,11 @@ char *get_pid(void)
  */
 void variable_replacement(char **line, int *exe_ret)
 {
-    int k = 0, len;
+    int k = 0, len, j;
     char *replacement = NULL, *old_com = NULL, *new_com;
 
     old_com = *line;
-    for (int j = 0; old_com[j]; j++)
+    for (j = 0; old_com[j]; j++)
     {
         if (old_com[j] == '$' && old_com[j + 1] &&
             old_com[j + 1] != ' ')
@@ -110,7 +110,6 @@ void variable_replacement(char **line, int *exe_ret)
  */
 void sig_handler(int sig)
 {
-    // char *prompt = _strcat(*_getenv("LOGNAME"), "%% ");
     char shell_prompt[15] = "haksam";
     char *prompt = _strcat(shell_prompt, " $ ");
 

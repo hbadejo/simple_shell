@@ -126,10 +126,11 @@ char **replace_aliases(char **argv)
 {
     alias_t *intr;
     char *new_val;
+    int i;
 
     if (_strcmp(argv[0], "alias") == 0)
         return (argv);
-    for (int i = 0; argv[i]; i++)
+    for (i = 0; argv[i]; i++)
     {
         intr = ll_aliases;
         while (intr)

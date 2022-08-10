@@ -100,7 +100,6 @@ char *get_argv(char *line, int *exe_ret)
 {
     size_t n = 0;
     ssize_t read;
-    // char *prompt = _strcat(*_getenv("LOGNAME"), "%% ");
     char shell_prompt[15] = "haksam";
     char *prompt = _strcat(shell_prompt, " $ ");
 
