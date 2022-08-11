@@ -50,7 +50,7 @@ int builtin_alias(char **argv, char __attribute__((__unused__)) **start)
 				ret_val = gen_error(argv + i, 1);
 		}
 		else
-		set_alias(argv[i], value);
+			set_alias(argv[i], value);
 	}
 	return (ret_val);
 }
@@ -153,6 +153,9 @@ char **replace_aliases(char **argv)
 			intr = intr->next;
 		}
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0041ec78cbc317d5ed556992de105c458a70921f
 	return (argv);
 }
