@@ -16,29 +16,29 @@
  */
 int run_argv(char **argv, char **start, int *exe_ret)
 {
-    int ret_val, i;
-    int (*builtin)(char **argv, char **start);
+	int ret_val, i;
+	int (*builtin)(char **argv, char **start);
 
-    builtin = get_builtin(argv[0]);
+	builtin = get_builtin(argv[0]);
 
-    if (builtin)
-    {
-        ret_val = builtin(argv + 1, start);
-        if (ret_val != EXIT)
-            *exe_ret = ret_val;
-    }
-    else
-    {
-        *exe_ret = runprog(argv, start);
-        ret_val = *exe_ret;
-    }
+	if (builtin)
+	{
+		ret_val = builtin(argv + 1, start);
+		if (ret_val != EXIT)
+			*exe_ret = ret_val;
+	}
+	else
+	{
+		*exe_ret = runprog(argv, start);
+		ret_val = *exe_ret;
+	}
 
-    hist++;
+	hist++;
 
-    for (i = 0; argv[i]; i++)
-        free(argv[i]);
+	for (i = 0; argv[i]; i++)
+		free(argv[i]);
 
-    return (ret_val);
+	return (ret_val);
 }
 
 /**
@@ -51,41 +51,41 @@ int run_argv(char **argv, char **start, int *exe_ret)
  */
 int handle_argv(int *exe_ret)
 {
-    int ret_val = 0, index;
-    char **argv, *line = NULL, **start;
+	int ret_val = 0, index;
+	char **argv, *line = NULL, **start;
 
-    line = get_argv(line, exe_ret);
-    if (!line)
-        return (END_OF_FILE);
+	line = get_argv(line, exe_ret);
+	if (!line)
+		return (END_OF_FILE);
 
-    argv = _strtok(line, " ");
-    free(line);
-    if (!argv)
-        return (ret_val);
-    if (check_argv(argv) != 0)
-    {
-        *exe_ret = 2;
-        free_argv(argv, argv);
-        return (*exe_ret);
-    }
-    start = argv;
+	argv = _strtok(line, " ");
+	free(line);
+	if (!argv)
+		return (ret_val);
+	if (check_argv(argv) != 0)
+	{
+		*exe_ret = 2;
+		free_argv(argv, argv);
+		return (*exe_ret);
+	}
+	start = argv;
 
-    for (index = 0; argv[index]; index++)
-    {
-        if (_strncmp(argv[index], ";", 1) == 0)
-        {
-            free(argv[index]);
-            argv[index] = NULL;
-            ret_val = call_argv(argv, start, exe_ret);
-            argv = &argv[++index];
-            index = 0;
-        }
-    }
-    if (argv)
-        ret_val = call_argv(argv, start, exe_ret);
+	for (index = 0; argv[index]; index++)
+	{
+		if (_strncmp(argv[index], ";", 1) == 0)
+		{
+			free(argv[index]);
+			argv[index] = NULL;
+			ret_val = call_argv(argv, start, exe_ret);
+			argv = &argv[++index];
+			index = 0;
+		}
+	}
+	if (argv)
+		ret_val = call_argv(argv, start, exe_ret);
 
-    free(start);
-    return (ret_val);
+	free(start);
+	return (ret_val);
 }
 
 /**
@@ -98,30 +98,30 @@ int handle_argv(int *exe_ret)
  */
 char *get_argv(char *line, int *exe_ret)
 {
-    size_t n = 0;
-    ssize_t read;
-    char shell_prompt[15] = "haksam";
-    char *prompt = _strcat(shell_prompt, " $ ");
+	size_t n = 0;
+	ssize_t read;
+	char shell_prompt[15] = "haksam";
+	char *prompt = _strcat(shell_prompt, " $ ");
 
-    if (line)
-        free(line);
+	if (line)
+		free(line);
 
-    read = _getline(&line, &n, STDIN_FILENO);
-    if (read == -1)
-        return (NULL);
-    if (read == 1)
-    {
-        hist++;
-        if (isatty(STDIN_FILENO))
-            write(STDOUT_FILENO, prompt, 15);
-        return (get_argv(line, exe_ret));
-    }
+	read = _getline(&line, &n, STDIN_FILENO);
+	if (read == -1)
+		return (NULL);
+	if (read == 1)
+	{
+		hist++;
+		if (isatty(STDIN_FILENO))
+			write(STDOUT_FILENO, prompt, 15);
+		return (get_argv(line, exe_ret));
+	}
 
-    line[read - 1] = '\0';
-    variable_replacement(&line, exe_ret);
-    handle_line(&line, read);
+	line[read - 1] = '\0';
+	variable_replacement(&line, exe_ret);
+	handle_line(&line, read);
 
-    return (line);
+	return (line);
 }
 
 /**
@@ -134,52 +134,52 @@ char *get_argv(char *line, int *exe_ret)
  */
 int call_argv(char **argv, char **start, int *exe_ret)
 {
-    int ret_val, index;
+	int ret_val, index;
 
-    if (!argv[0])
-        return (*exe_ret);
-    for (index = 0; argv[index]; index++)
-    {
-        if (_strncmp(argv[index], "||", 2) == 0)
-        {
-            free(argv[index]);
-            argv[index] = NULL;
-            argv = replace_aliases(argv);
-            ret_val = run_argv(argv, start, exe_ret);
-            if (*exe_ret != 0)
-            {
-                argv = &argv[++index];
-                index = 0;
-            }
-            else
-            {
-                for (index++; argv[index]; index++)
-                    free(argv[index]);
-                return (ret_val);
-            }
-        }
-        else if (_strncmp(argv[index], "&&", 2) == 0)
-        {
-            free(argv[index]);
-            argv[index] = NULL;
-            argv = replace_aliases(argv);
-            ret_val = run_argv(argv, start, exe_ret);
-            if (*exe_ret == 0)
-            {
-                argv = &argv[++index];
-                index = 0;
-            }
-            else
-            {
-                for (index++; argv[index]; index++)
-                    free(argv[index]);
-                return (ret_val);
-            }
-        }
-    }
-    argv = replace_aliases(argv);
-    ret_val = run_argv(argv, start, exe_ret);
-    return (ret_val);
+	if (!argv[0])
+		return (*exe_ret);
+	for (index = 0; argv[index]; index++)
+	{
+		if (_strncmp(argv[index], "||", 2) == 0)
+		{
+			free(argv[index]);
+			argv[index] = NULL;
+			argv = replace_aliases(argv);
+			ret_val = run_argv(argv, start, exe_ret);
+			if (*exe_ret != 0)
+			{
+				argv = &argv[++index];
+				index = 0;
+			}
+			else
+			{
+				for (index++; argv[index]; index++)
+					free(argv[index]);
+				return (ret_val);
+			}
+		}
+		else if (_strncmp(argv[index], "&&", 2) == 0)
+		{
+			free(argv[index]);
+			argv[index] = NULL;
+			argv = replace_aliases(argv);
+			ret_val = run_argv(argv, start, exe_ret);
+			if (*exe_ret == 0)
+			{
+				argv = &argv[++index];
+				index = 0;
+			}
+			else
+			{
+				for (index++; argv[index]; index++)
+					free(argv[index]);
+				return (ret_val);
+			}
+		}
+	}
+	argv = replace_aliases(argv);
+	ret_val = run_argv(argv, start, exe_ret);
+	return (ret_val);
 }
 
 /**
@@ -192,50 +192,50 @@ int call_argv(char **argv, char **start, int *exe_ret)
  */
 int runprog(char **argv, char **start)
 {
-    pid_t child_pid;
-    int status, flag = 0, ret_val = 0;
-    char *command = argv[0];
+	pid_t child_pid;
+	int status, flag = 0, ret_val = 0;
+	char *command = argv[0];
 
-    if (command[0] != '/' && command[0] != '.')
-    {
-        flag = 1;
-        command = get_location(command);
-    }
+	if (command[0] != '/' && command[0] != '.')
+	{
+		flag = 1;
+		command = get_location(command);
+	}
 
-    if (!command || (access(command, F_OK) == -1))
-    {
-        if (errno == EACCES)
-            ret_val = (gen_error(argv, 126));
-        else
-            ret_val = (gen_error(argv, 127));
-    }
-    else
-    {
-        child_pid = fork();
-        if (child_pid == -1)
-        {
-            if (flag)
-                free(command);
-            perror("Error child:");
-            return (1);
-        }
-        if (child_pid == 0)
-        {
-            execve(command, argv, environ);
-            if (errno == EACCES)
-                ret_val = (gen_error(argv, 126));
-            free_env();
-            free_argv(argv, start);
-            free_alias_list(ll_aliases);
-            _exit(ret_val);
-        }
-        else
-        {
-            wait(&status);
-            ret_val = WEXITSTATUS(status);
-        }
-    }
-    if (flag)
-        free(command);
-    return (ret_val);
+	if (!command || (access(command, F_OK) == -1))
+	{
+		if (errno == EACCES)
+			ret_val = (gen_error(argv, 126));
+		else
+			ret_val = (gen_error(argv, 127));
+	}
+	else
+	{
+		child_pid = fork();
+		if (child_pid == -1)
+		{
+			if (flag)
+				free(command);
+			perror("Error child:");
+			return (1);
+		}
+		if (child_pid == 0)
+		{
+			execve(command, argv, environ);
+			if (errno == EACCES)
+				ret_val = (gen_error(argv, 126));
+			free_env();
+			free_argv(argv, start);
+			free_alias_list(ll_aliases);
+			_exit(ret_val);
+		}
+		else
+		{
+			wait(&status);
+			ret_val = WEXITSTATUS(status);
+		}
+	}
+	if (flag)
+		free(command);
+	return (ret_val);
 }

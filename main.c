@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 		if (ret_val == END_OF_FILE || ret_val == EXIT)
 		{
 			if (ret_val == END_OF_FILE)
-			write(STDOUT_FILENO, new_com, 1);
+				write(STDOUT_FILENO, new_com, 1);
 			free_env();
 			free_alias_list(ll_aliases);
 			exit(*exe_ret);

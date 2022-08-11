@@ -30,13 +30,13 @@ char **_copyenv(void)
 	{
 		new_environ[index] = malloc(_strlen(environ[index]) + 1);
 
-	if (!new_environ[index])
-	{
-		for (index--; index >= 0; index--)
-			free(new_environ[index]);
-		free(new_environ);
-		return (NULL);
-	}
+		if (!new_environ[index])
+		{
+			for (index--; index >= 0; index--)
+				free(new_environ[index]);
+			free(new_environ);
+			return (NULL);
+		}
 		_strcpy(new_environ[index], environ[index]);
 	}
 	new_environ[index] = NULL;
